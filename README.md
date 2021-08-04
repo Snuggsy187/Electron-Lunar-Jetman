@@ -2,9 +2,8 @@
 
 Lunar Jetman for the Acorn Electron
 
-[Download Elkulator Disk Image Beta !](https://github.com/Snuggsy187/Electron-Lunar-Jetman/raw/main/Releases/LJM-E-v0.80.ssd)
-
-[Download Elkulator Tape Image Beta !](https://github.com/Snuggsy187/Electron-Lunar-Jetman/raw/main/Releases/LJM-E-v0.80.uef)
+[Download Elkulator Disk Image version 0.8 !](https://github.com/Snuggsy187/Electron-Lunar-Jetman/raw/main/Releases/LJM-E-v0.80.ssd)
+[Download Elkulator Tape Image version 0.8 !](https://github.com/Snuggsy187/Electron-Lunar-Jetman/raw/main/Releases/LJM-E-v0.80.uef)
 
 Acorn Electron (real hardware) version coming really soon !
 
