@@ -1,0 +1,79 @@
+
+.Interrupt
+	STX inxsave					; Save X Register
+; Is the interrupt from master IRQ ?
+	LDA &FE00
+	AND #&01
+	BEQ finished2
+
+; Are we at VSync ?
+	LDA &FE00
+	AND #&04
+	BEQ Int_RTC					; Branch if not at VSync, maybe we're at RTC
+
+; @ vsync
+	LDA #&00: STA whichsection
+	LDA #&FF: STA &FE08: STA &FE09			; Blank Palette
+	LDA #&10: STA &FE05				; Clear Screen Interrupt
+; Process White Noise Sound
+	LDA Sound_On_Off: BNE finished			; End if muted in game
+	LDA White_Noise_Count				; Sound duration counter
+	BEQ finished2					; End if no White Noise to play
+	JSR rand: AND #&1F: STA &FE06			; Put random number in sound buffer
+	LDA #&22: STA &FE07				; Activate sound
+	DEC White_Noise_Count
+; Small delay to actually hear the sound
+	LDX #&80
+.fin
+	DEX: BNE fin
+
+.finished
+	LDA #&20: STA &FE07				; Mute sound
+.finished2
+	LDX inxsave					; Restore X Register
+	LDA &FC						; Restore A Register
+	RTI						; Return from Interrupt
+
+
+.Int_RTC
+; Are we at RTC line 100 ?
+	LDA &FE00
+	AND #&08
+	BEQ finished					; Branch if not at RTC
+; Small delay to obscure &6700-6980
+	LDX #&98					; NEEDS CHANGING FOR REAL ELECTRON
+.ihold
+	DEX: BNE ihold
+
+; Change palette to White on Blue
+;	LDX #&04: STX &FE08
+;	STX &FE09
+	LDX #&00: STX &FE08
+	LDX #&11: STX &FE09
+; Delay for stat bar colour
+	LDX #&63					; NEEDS CHANGING FOR REAL ELECTRON
+.ihold2
+	DEX: BNE ihold2
+
+; Change palette to gameplay colour
+	LDX colour					; Current gameplay colour
+	LDA Palette_Data8,X: STA &FE08
+	LDA Palette_Data9,X: STA &FE09
+	LDA #&01: STA whichsection
+	INC sync					; In game counter
+	LDA #&20: STA &FE05				; Clear RTC Interrupt
+
+; Process other sounds
+	LDA Sound_On_Off: BNE finished			; End if muted in game
+	LDX multitask: BEQ finished			; End if no sound to play
+	DEC multitask					; Sound duration counter
+	LDA pitchlist,X: BEQ sound_zero			; Branch if at end of sound data
+	STA &FE06					; Put sound data in buffer
+	LDA #&22: STA &FE07				; Activate sound
+	BNE finished2
+
+.sound_zero
+	STA multitask					; Sound finished - empty flag
+	BEQ finished
+
+
